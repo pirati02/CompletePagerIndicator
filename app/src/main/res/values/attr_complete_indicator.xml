@@ -4,6 +4,8 @@
         <attr name="currentItemRadius" format="integer" />
         <attr name="filledItemColor" format="color" />
         <attr name="lineSize" format="integer" />
+        <attr name="clickColor" format="color" />
+        <attr name="clickColorEnabled" format="boolean" />
         <attr name="showLine" format="boolean" />
         <attr name="showNumbers" format="boolean" />
         <attr name="unFilledItemColor" format="color" />

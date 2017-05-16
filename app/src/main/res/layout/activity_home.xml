@@ -13,6 +13,8 @@
         app:currentItemRadius="45"
         app:filledItemColor="#7e00ec"
         app:radius="35"
+        app:clickColor="#ffff00"
+        app:clickColorEnabled="true"
         app:showLine="false"
         app:unFilledItemColor="#0059ff" />
 

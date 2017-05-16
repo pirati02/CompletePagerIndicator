@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.os.Handler
 import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -18,6 +19,7 @@ class CompleteIndicator : View {
     private var mCalculatedWidth: Int = 0
     lateinit var mUnfillPaint: Paint
     lateinit var mFillPaint: Paint
+    lateinit var mClickPaint: Paint
     lateinit var mTextPaint: Paint
     private var mRadius: Int = 0
     private var mCurrentItemRadius: Int = 0
@@ -29,6 +31,8 @@ class CompleteIndicator : View {
     private var mLineSize: Int = 0
     private var mCurrentLineSize: Int = 50
     lateinit var circleCoordinates: HashMap<Int, Int>
+    private var mItemClicked: Boolean = false
+    private var mClickColorEnabled: Boolean = true
 
     constructor(context: Context) : super(context) {
     }
@@ -51,6 +55,8 @@ class CompleteIndicator : View {
         mTextPaint.typeface = Typeface.DEFAULT_BOLD
         mTextPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16f, resources.displayMetrics)
         mTextPaint.color = Color.WHITE
+        mClickPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mClickPaint.color = Color.RED
 
         circleCoordinates = hashMapOf()
 
@@ -63,7 +69,10 @@ class CompleteIndicator : View {
         mShowNumbers = a.getBoolean(R.styleable.CompleteIndicator_showNumbers, true)
         mShowLine = a.getBoolean(R.styleable.CompleteIndicator_showLine, true)
         mLineSize = a.getInt(R.styleable.CompleteIndicator_lineSize, 10)
+        mClickColorEnabled = a.getBoolean(R.styleable.CompleteIndicator_clickColorEnabled, true)
+        var clickColor = a.getColor(R.styleable.CompleteIndicator_clickColor, Color.RED)
 
+        mClickPaint.color = clickColor
         mUnfillPaint.color = unFillColor
         mFillPaint.color = fillColor
 
@@ -90,8 +99,17 @@ class CompleteIndicator : View {
                 canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mRadius.toFloat(), mUnfillPaint)
             }
 
-            if (mCurrentState == it)
-                canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mCurrentItemRadius.toFloat(), mFillPaint)
+            if (mCurrentState == it) {
+                if (mItemClicked && mClickColorEnabled) {
+                    canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mCurrentItemRadius.toFloat(), mClickPaint)
+                    Handler().postDelayed({
+                        mItemClicked = false
+                        invalidate()
+                    },100)
+                } else {
+                    canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mCurrentItemRadius.toFloat(), mFillPaint)
+                }
+            }
             if (mShowNumbers)
                 canvas.drawText(it.toString(), currentDelimition - 10, 64f, mTextPaint)
 
@@ -142,8 +160,10 @@ class CompleteIndicator : View {
                 val diff = event.rawX - initialX
                 if (diff < 10) {
                     val circle = getCircle(event.rawX.toInt())
-                    if (circle != 0)
+                    if (circle != 0) {
                         onItemClickListener!!.item(circle)
+                        mItemClicked = true
+                    }
                 }
             }
         }
@@ -155,7 +175,7 @@ class CompleteIndicator : View {
         circleCoordinates.forEach {
             val diffFrom = raw - it.value
             val diffTo = it.value - raw
-            if ((diffFrom in -10..10) || (diffTo in 10..30))
+            if ((diffFrom in -20..10) || (diffTo in 10..40))
                 result = it.key
         }
         return result
