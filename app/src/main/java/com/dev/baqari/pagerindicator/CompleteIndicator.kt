@@ -131,11 +131,6 @@ class CompleteIndicator : View {
         }
     }
 
-    fun setCircleRadius(mRadius: Int) {
-        this.mRadius = mRadius
-        invalidate()
-    }
-
     var initialX = 0f
     override fun onTouchEvent(event: MotionEvent?): Boolean {
 
@@ -157,7 +152,7 @@ class CompleteIndicator : View {
 
     fun getCircle(raw: Int): Int {
         var result = 0
-        circleCoordinates!!.forEach {
+        circleCoordinates.forEach {
             val diffFrom = raw - it.value
             val diffTo = it.value - raw
             if ((diffFrom in -10..10) || (diffTo in 10..30))
