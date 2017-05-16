@@ -160,7 +160,7 @@ class CompleteIndicator : View {
         circleCoordinates!!.forEach {
             val diffFrom = raw - it.value
             val diffTo = it.value - raw
-            if ((diffFrom in -10..10) || (diffTo in 10..20))
+            if ((diffFrom in -10..10) || (diffTo in 10..30))
                 result = it.key
         }
         return result
