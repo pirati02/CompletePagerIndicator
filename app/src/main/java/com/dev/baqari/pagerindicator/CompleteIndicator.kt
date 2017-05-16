@@ -5,8 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.support.v4.view.ViewPager
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -15,12 +13,12 @@ import android.view.View
 
 class CompleteIndicator : View {
 
-    private var mViewPager: ViewPager? = null
+    lateinit var mViewPager: ViewPager
     private var pageCount: Int = 0
     private var mCalculatedWidth: Int = 0
-    private var mUnfillPaint: Paint? = null
-    private var mFillPaint: Paint? = null
-    private var mTextPaint: Paint? = null
+    lateinit var mUnfillPaint: Paint
+    lateinit var mFillPaint: Paint
+    lateinit var mTextPaint: Paint
     private var mRadius: Int = 0
     private var mCurrentItemRadius: Int = 0
     private var mCurrentState: Int = 1
@@ -30,8 +28,7 @@ class CompleteIndicator : View {
     private var mShowLine: Boolean = true
     private var mLineSize: Int = 0
     private var mCurrentLineSize: Int = 50
-
-    private var circleCoordinates: HashMap<Int, Int>? = null
+    lateinit var circleCoordinates: HashMap<Int, Int>
 
     constructor(context: Context) : super(context) {
     }
@@ -47,13 +44,13 @@ class CompleteIndicator : View {
     private fun init(attrs: AttributeSet) {
 
         mUnfillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mUnfillPaint!!.color = Color.RED
+        mUnfillPaint.color = Color.RED
         mFillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mFillPaint!!.color = Color.GREEN
+        mFillPaint.color = Color.GREEN
         mTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mTextPaint!!.typeface = Typeface.DEFAULT_BOLD
-        mTextPaint!!.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16f, resources.displayMetrics)
-        mTextPaint!!.color = Color.WHITE
+        mTextPaint.typeface = Typeface.DEFAULT_BOLD
+        mTextPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16f, resources.displayMetrics)
+        mTextPaint.color = Color.WHITE
 
         circleCoordinates = hashMapOf()
 
@@ -67,15 +64,14 @@ class CompleteIndicator : View {
         mShowLine = a.getBoolean(R.styleable.CompleteIndicator_showLine, true)
         mLineSize = a.getInt(R.styleable.CompleteIndicator_lineSize, 10)
 
-        mUnfillPaint!!.color = unFillColor
-        mFillPaint!!.color = fillColor
+        mUnfillPaint.color = unFillColor
+        mFillPaint.color = fillColor
 
         a.recycle()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     override fun onDraw(canvas: Canvas) {
-        circleCoordinates!!.clear()
+        circleCoordinates.clear()
 
         if (mShowLine) {
             var currentLineDelimition = 0f
@@ -87,10 +83,10 @@ class CompleteIndicator : View {
         var currentDelimition = 100f
         (1..pageCount).forEach {
             if (mCurrentState > it) {
-                circleCoordinates!!.put(it, currentDelimition.toInt())
+                circleCoordinates.put(it, currentDelimition.toInt())
                 canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mRadius.toFloat(), mFillPaint)
             } else {
-                circleCoordinates!!.put(it, currentDelimition.toInt())
+                circleCoordinates.put(it, currentDelimition.toInt())
                 canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mRadius.toFloat(), mUnfillPaint)
             }
 
@@ -110,29 +106,34 @@ class CompleteIndicator : View {
     }
 
     fun setViewPager(viewPager: ViewPager) {
-        this.mViewPager = viewPager
-        if (viewPager.adapter != null) {
-            pageCount = mViewPager!!.adapter.count
+        if (viewPager != null) {
+            this.mViewPager = viewPager
+
+            pageCount = mViewPager.adapter!!.count
             mCurrentState - viewPager.currentItem
+
+            mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {
+
+                }
+
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                }
+
+                override fun onPageSelected(position: Int) {
+                    mCurrentState = position + 1
+                    invalidate()
+                }
+
+            })
+        } else {
+            throw NullPointerException("ViewPager must be initialized")
         }
-        mViewPager!!.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {
-
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                mCurrentState = position + 1
-                invalidate()
-            }
-
-        })
     }
 
     fun setCircleRadius(mRadius: Int) {
         this.mRadius = mRadius
+        invalidate()
     }
 
     var initialX = 0f
