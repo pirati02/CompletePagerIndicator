@@ -1,0 +1,10 @@
+<resources>
+    <declare-styleable name="CompleteIndicator">
+        <attr name="radius" format="integer" />
+        <attr name="currentItemRadius" format="integer" />
+        <attr name="filledItemColor" format="color" />
+        <attr name="lineSize" format="integer"/>
+        <attr name="showNumbers" format="boolean" />
+        <attr name="unFilledItemColor" format="color" />
+    </declare-styleable>
+</resources>

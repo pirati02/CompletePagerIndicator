@@ -18,39 +18,57 @@ class CompleteIndicator : View {
     private var mViewPager: ViewPager? = null
     private var pageCount: Int = 0
     private var mCalculatedWidth: Int = 0
-    private var mPaint: Paint? = null
-    private var mGreenPaint: Paint? = null
+    private var mUnfillPaint: Paint? = null
+    private var mFillPaint: Paint? = null
     private var mTextPaint: Paint? = null
     private var mRadius: Int = 0
+    private var mCurrentItemRadius: Int = 0
     private var mCurrentState: Int = 1
     private var mDelimition: Int = 0
     private var onItemClickListener: OnItemClickListener? = null
+    private var mShowNumbers: Boolean = true
+    private var mLineSize: Int = 0
+    private var mCurrentLineSize: Int = 50
 
     private var circleCoordinates: HashMap<Int, Int>? = null
 
     constructor(context: Context) : super(context) {
-        init()
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init()
+        init(attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        init()
+        init(attrs)
     }
 
-    private fun init() {
-        mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mPaint!!.color = Color.RED
-        mGreenPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mGreenPaint!!.color = Color.GREEN
+    private fun init(attrs: AttributeSet) {
+
+        mUnfillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mUnfillPaint!!.color = Color.RED
+        mFillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mFillPaint!!.color = Color.GREEN
         mTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mTextPaint!!.typeface = Typeface.DEFAULT_BOLD
         mTextPaint!!.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16f, resources.displayMetrics)
         mTextPaint!!.color = Color.WHITE
 
         circleCoordinates = hashMapOf()
+
+        val a = context.obtainStyledAttributes(attrs, R.styleable.CompleteIndicator, 0, 0)
+
+        mRadius = a.getInt(R.styleable.CompleteIndicator_radius, 27)
+        mCurrentItemRadius = a.getColor(R.styleable.CompleteIndicator_currentItemRadius, 33)
+        val fillColor = a.getColor(R.styleable.CompleteIndicator_filledItemColor, Color.GREEN)
+        val unFillColor = a.getColor(R.styleable.CompleteIndicator_unFilledItemColor, Color.RED)
+        mShowNumbers = a.getBoolean(R.styleable.CompleteIndicator_showNumbers, true)
+        mLineSize = a.getInt(R.styleable.CompleteIndicator_lineSize, 10)
+
+        mUnfillPaint!!.color = unFillColor
+        mFillPaint!!.color = fillColor
+
+        a.recycle()
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -59,22 +77,23 @@ class CompleteIndicator : View {
 
         var currentLineDelimition = 0f
         currentLineDelimition += ((mDelimition * mCurrentState) - 80).toFloat()
-        canvas.drawRect(15f, 50f, currentLineDelimition, 60f, mGreenPaint)
-        canvas.drawRect(currentLineDelimition, 50f, (mCalculatedWidth - 25).toFloat(), 60f, mPaint)
+        canvas.drawRect(15f, mCurrentLineSize.toFloat(), currentLineDelimition, 60f + (mLineSize / 2).toFloat(), mFillPaint)
+        canvas.drawRect(currentLineDelimition, mCurrentLineSize.toFloat(), (mCalculatedWidth - 25).toFloat(), 60f + (mLineSize / 2).toFloat(), mUnfillPaint)
 
         var currentDelimition = 100f
         (1..pageCount).forEach {
             if (mCurrentState > it) {
                 circleCoordinates!!.put(it, currentDelimition.toInt())
-                canvas.drawCircle(currentDelimition, 55f, 27f, mGreenPaint)
+                canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mRadius.toFloat(), mFillPaint)
             } else {
                 circleCoordinates!!.put(it, currentDelimition.toInt())
-                canvas.drawCircle(currentDelimition, 55f, 27f, mPaint)
+                canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mRadius.toFloat(), mUnfillPaint)
             }
 
             if (mCurrentState == it)
-                canvas.drawCircle(currentDelimition, 55f, 37f, mGreenPaint)
-            canvas.drawText(it.toString(), currentDelimition - 10, 64f, mTextPaint)
+                canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mCurrentItemRadius.toFloat(), mFillPaint)
+            if (mShowNumbers)
+                canvas.drawText(it.toString(), currentDelimition - 10, 64f, mTextPaint)
 
             currentDelimition += mDelimition
         }

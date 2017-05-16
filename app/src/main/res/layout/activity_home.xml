@@ -9,7 +9,11 @@
     <com.dev.baqari.pagerindicator.CompleteIndicator
         android:id="@+id/complete_indicator"
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:layout_height="50dp"
+        app:currentItemRadius="45"
+        app:filledItemColor="#7e00ec"
+        app:radius="40"
+        app:unFilledItemColor="#0059ff" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
