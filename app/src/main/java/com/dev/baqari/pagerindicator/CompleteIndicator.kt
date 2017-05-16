@@ -27,6 +27,7 @@ class CompleteIndicator : View {
     private var mDelimition: Int = 0
     private var onItemClickListener: OnItemClickListener? = null
     private var mShowNumbers: Boolean = true
+    private var mShowLine: Boolean = true
     private var mLineSize: Int = 0
     private var mCurrentLineSize: Int = 50
 
@@ -63,6 +64,7 @@ class CompleteIndicator : View {
         val fillColor = a.getColor(R.styleable.CompleteIndicator_filledItemColor, Color.GREEN)
         val unFillColor = a.getColor(R.styleable.CompleteIndicator_unFilledItemColor, Color.RED)
         mShowNumbers = a.getBoolean(R.styleable.CompleteIndicator_showNumbers, true)
+        mShowLine = a.getBoolean(R.styleable.CompleteIndicator_showLine, true)
         mLineSize = a.getInt(R.styleable.CompleteIndicator_lineSize, 10)
 
         mUnfillPaint!!.color = unFillColor
@@ -75,10 +77,12 @@ class CompleteIndicator : View {
     override fun onDraw(canvas: Canvas) {
         circleCoordinates!!.clear()
 
-        var currentLineDelimition = 0f
-        currentLineDelimition += ((mDelimition * mCurrentState) - 80).toFloat()
-        canvas.drawRect(15f, mCurrentLineSize.toFloat(), currentLineDelimition, 60f + (mLineSize / 2).toFloat(), mFillPaint)
-        canvas.drawRect(currentLineDelimition, mCurrentLineSize.toFloat(), (mCalculatedWidth - 25).toFloat(), 60f + (mLineSize / 2).toFloat(), mUnfillPaint)
+        if (mShowLine) {
+            var currentLineDelimition = 0f
+            currentLineDelimition += ((mDelimition * mCurrentState) - 75).toFloat()
+            canvas.drawRect(15f, mCurrentLineSize.toFloat(), currentLineDelimition, 60f + (mLineSize / 2).toFloat(), mFillPaint)
+            canvas.drawRect(currentLineDelimition, mCurrentLineSize.toFloat(), (mCalculatedWidth - 25).toFloat(), 60f + (mLineSize / 2).toFloat(), mUnfillPaint)
+        }
 
         var currentDelimition = 100f
         (1..pageCount).forEach {
