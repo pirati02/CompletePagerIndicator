@@ -22,10 +22,10 @@ class HomeActivity : AppCompatActivity() {
         viewPager.adapter = adapter
 
         complete_indicator.setViewPager(viewPager)
-        complete_indicator.setOnItemClickListener(object : OnItemClickListener {
+        complete_indicator.onItemClickListener = object : OnItemClickListener {
             override fun item(id: Int) {
                 viewPager.currentItem = (id - 1)
             }
-        })
+        }
     }
 }

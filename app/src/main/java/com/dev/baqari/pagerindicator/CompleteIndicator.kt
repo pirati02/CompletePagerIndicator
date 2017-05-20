@@ -25,7 +25,7 @@ class CompleteIndicator : View {
     private var mCurrentItemRadius: Int = 0
     private var mCurrentState: Int = 1
     private var mDelimition: Int = 0
-    private var onItemClickListener: OnItemClickListener? = null
+    var onItemClickListener: OnItemClickListener? = null
     private var mShowNumbers: Boolean = true
     private var mShowLine: Boolean = true
     private var mLineSize: Int = 0
@@ -33,9 +33,6 @@ class CompleteIndicator : View {
     lateinit var circleCoordinates: HashMap<Int, Int>
     private var mItemClicked: Boolean = false
     private var mClickColorEnabled: Boolean = true
-
-    constructor(context: Context) : super(context) {
-    }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         init(attrs)
@@ -82,14 +79,15 @@ class CompleteIndicator : View {
     override fun onDraw(canvas: Canvas) {
         circleCoordinates.clear()
 
+        var currentDelimition = 100f
+
         if (mShowLine) {
             var currentLineDelimition = 0f
             currentLineDelimition += ((mDelimition * mCurrentState) - 75).toFloat()
             canvas.drawRect(15f, mCurrentLineSize.toFloat(), currentLineDelimition, 60f + (mLineSize / 2).toFloat(), mFillPaint)
             canvas.drawRect(currentLineDelimition, mCurrentLineSize.toFloat(), (mCalculatedWidth - 25).toFloat(), 60f + (mLineSize / 2).toFloat(), mUnfillPaint)
         }
-
-        var currentDelimition = 100f
+        
         (1..pageCount).forEach {
             if (mCurrentState > it) {
                 circleCoordinates.put(it, currentDelimition.toInt())
@@ -105,7 +103,7 @@ class CompleteIndicator : View {
                     Handler().postDelayed({
                         mItemClicked = false
                         invalidate()
-                    },100)
+                    }, 100)
                 } else {
                     canvas.drawCircle(currentDelimition, mCurrentLineSize.toFloat() + 5, mCurrentItemRadius.toFloat(), mFillPaint)
                 }
@@ -179,9 +177,5 @@ class CompleteIndicator : View {
                 result = it.key
         }
         return result
-    }
-
-    fun setOnItemClickListener(clickListener: OnItemClickListener) {
-        onItemClickListener = clickListener
     }
 }
